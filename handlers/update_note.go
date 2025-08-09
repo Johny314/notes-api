@@ -18,28 +18,30 @@ import (
 // @Param id path int true "Note ID"
 // @Param note body models.Note true "Updated note object"
 // @Success 200 {object} models.Note
-// @Failure 400 {string} string "Invalid input"
-// @Failure 404 {string} string "Note not found"
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
 // @Router /notes/{id} [put]
 func UpdateNote(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 
 	var note models.Note
 	if err := storage.DB.First(&note, id).Error; err != nil {
-		http.Error(w, "Note not found", http.StatusNotFound)
+		HandleError(w, err, "Note not found", http.StatusNotFound)
 		return
 	}
 
 	var updated models.Note
 	if err := json.NewDecoder(r.Body).Decode(&updated); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		HandleError(w, err, "Invalid input", http.StatusBadRequest)
 		return
 	}
 
 	note.Title = updated.Title
 	note.Content = updated.Content
-	storage.DB.Save(&note)
+	if err := storage.DB.Save(&note).Error; err != nil {
+		HandleError(w, err, "Failed to update note", http.StatusInternalServerError)
+		return
+	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(note)
+	SendSuccess(w, note)
 }

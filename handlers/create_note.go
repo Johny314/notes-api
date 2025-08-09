@@ -16,17 +16,19 @@ import (
 // @Produce json
 // @Param note body models.Note true "Note object"
 // @Success 200 {object} models.Note
-// @Failure 400 {string} string
+// @Failure 400 {object} map[string]string
 // @Router /notes [post]
 func CreateNote(w http.ResponseWriter, r *http.Request) {
 	var note models.Note
 	if err := json.NewDecoder(r.Body).Decode(&note); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		HandleError(w, err, "Failed to decode note", http.StatusBadRequest)
 		return
 	}
 
-	storage.DB.Create(&note)
+	if err := storage.DB.Create(&note).Error; err != nil {
+		HandleError(w, err, "Failed to create note", http.StatusInternalServerError)
+		return
+	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(note)
+	SendSuccess(w, note)
 }

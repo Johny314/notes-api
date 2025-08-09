@@ -14,16 +14,15 @@ import (
 // @Tags notes
 // @Param id path int true "Note ID"
 // @Success 204 "No Content"
-// @Failure 400 {string} string "Invalid ID"
-// @Failure 404 {string} string "Note not found"
+// @Failure 404 {object} map[string]string
 // @Router /notes/{id} [delete]
 func DeleteNote(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 
 	if err := storage.DB.Delete(&models.Note{}, id).Error; err != nil {
-		http.Error(w, "Note not found", http.StatusNotFound)
+		HandleError(w, err, "Note not found", http.StatusNotFound)
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	SendNoContent(w)
 }

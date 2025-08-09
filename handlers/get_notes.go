@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/jeka314/notes-api/models"
@@ -15,10 +14,12 @@ import (
 // @Produce json
 // @Success 200 {array} models.Note
 // @Router /notes [get]
-func GetNotes(w http.ResponseWriter, r *http.Request) {
+func GetNotes(w http.ResponseWriter, _ *http.Request) {
 	var notes []models.Note
-	storage.DB.Find(&notes)
+	if err := storage.DB.Find(&notes).Error; err != nil {
+		HandleError(w, err, "Failed to get notes", http.StatusInternalServerError)
+		return
+	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(notes)
+	SendSuccess(w, notes)
 }
