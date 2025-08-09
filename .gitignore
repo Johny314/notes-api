@@ -1,0 +1,23 @@
+# Игнорировать папку с настройками IDE GoLand
+.idea/
+
+# Файлы базы SQLite
+notes.db
+
+# Сгенерированные swagger файлы
+/docs/
+/docs/*
+
+# Бинарные файлы
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Логи
+*.log
+
+# Файлы сборки и кеши
+bin/
+build/
