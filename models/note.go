@@ -1,7 +1,7 @@
 package models
 
 type Note struct {
-	ID      uint   `json:"id" gorm:"primaryKey"`
-	Title   string `json:"title"`
-	Content string `json:"content"`
+	ID      uint   `json:"id"`
+	Title   string `json:"title" validate:"required,min=3,max=100"`
+	Content string `json:"content" validate:"required"`
 }

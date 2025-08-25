@@ -25,6 +25,11 @@ func CreateNote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if err := validate.Struct(note); err != nil {
+		HandleError(w, err, "Validation failed: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	if err := storage.DB.Create(&note).Error; err != nil {
 		HandleError(w, err, "Failed to create note", http.StatusInternalServerError)
 		return

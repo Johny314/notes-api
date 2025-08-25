@@ -36,6 +36,11 @@ func UpdateNote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if err := validate.Struct(note); err != nil {
+		HandleError(w, err, "Validation failed: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	note.Title = updated.Title
 	note.Content = updated.Content
 	if err := storage.DB.Save(&note).Error; err != nil {
